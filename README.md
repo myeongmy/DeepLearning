@@ -8,5 +8,5 @@ ____
 
 ### Assignments
 ____
-* [assignment1](http://github.com/myeongmy/deepLearning/assignment1)
+* [assignment1](https://github.com/myeongmy/deepLearning/tree/master/assignment1)
 
