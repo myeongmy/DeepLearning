@@ -1,4 +1,4 @@
-# CS231n 2017
+# CS231n 2017 : Convolutional neural networks for Visual Recognition
 stanford univ. cs231n lecture assignments &amp; 강의 내용 정리
 
 ### 강의 노트
