@@ -8,6 +8,6 @@ ____
 
 ### Assignments
 ____
-* [assignment1](https://github.com/myeongmy/deepLearning/tree/master/assignment1) [[Report 보기]]()
+* [assignment1](https://github.com/myeongmy/deepLearning/tree/master/assignment1) [[Report 보기]](https://github.com/myeongmy/deepLearning/blob/master/assignment1/Assignment%201%20Report.docx)
 * [assignment2](https://github.com/myeongmy/deepLearning/tree/master/assignment2)
 
