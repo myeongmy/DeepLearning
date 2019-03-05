@@ -162,7 +162,9 @@ class KNearestNeighbor(object):
       # neighbors. Store these labels in closest_y.                           #
       # Hint: Look up the function numpy.argsort.                             #
       #########################################################################
-      pass
+      dists_sort = np.argsort(dists[i,:])
+      closest_y = self.y_train(dists_sort[0:k])
+
       #########################################################################
       # TODO:                                                                 #
       # Now that you have found the labels of the k nearest neighbors, you    #
@@ -170,7 +172,8 @@ class KNearestNeighbor(object):
       # Store this label in y_pred[i]. Break ties by choosing the smaller     #
       # label.                                                                #
       #########################################################################
-      pass
+      classes, countNum = np.unique(closest_y, return_counts=True)
+      y_pred[i]=classes(np.argmax(countNum))
       #########################################################################
       #                           END OF YOUR CODE                            # 
       #########################################################################
