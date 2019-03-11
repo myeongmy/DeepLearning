@@ -418,25 +418,23 @@ def conv_forward_naive(x, w, b, conv_param):
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
 
-    # Extract shapes and constants
+    # 입력 변수 shpae으로부터 변수 추출
     N, C, H, W = x.shape
     F, _, HH, WW = w.shape
-    stride = conv_param.get('stride', 1)
-    pad = conv_param.get('pad', 0)
-    # Check for parameter sanity
-    assert (H + 2 * pad - HH) % stride == 0, 'Sanity Check Status: Conv Layer Failed in Height'
-    assert (W + 2 * pad - WW) % stride == 0, 'Sanity Check Status: Conv Layer Failed in Width'
+    stride = conv_param.get('stride', 1) #stride : sliding 할 때 몇 pixel씩 이동할지
+    pad = conv_param.get('pad', 0) #zero-padding 시 0을 넣을 픽셀 수
+    
     H_prime = 1 + (H + 2 * pad - HH) // stride
     W_prime = 1 + (W + 2 * pad - WW) // stride
     # Padding
     x_pad = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), 'constant', constant_values=0)
-    # Construct output
+    # 최종 출력 out 초기화
     out = np.zeros((N, F, H_prime, W_prime))
     # Naive Loops
-    for n in range(N):
-        for f in range(F):
-            for j in range(0, H_prime):
-                for i in range(0, W_prime):
+    for n in range(N):   #각 이미지마다
+        for f in range(F):   #각 필터마다
+            for j in range(0, H_prime):   #각 높이마다
+                for i in range(0, W_prime):   #각 너비마다
                     out[n, f, j, i] = (x_pad[n, :, j*stride:j*stride+HH, i*stride:i*stride+WW] * w[f, :, :, :]).sum() + b[f]
 
     ###########################################################################
@@ -464,7 +462,7 @@ def conv_backward_naive(dout, cache):
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
 
-    # Extract shapes and constants
+    # 변수 값 추출
     x, w, b, conv_param = cache
     N, C, H, W = x.shape
     F, _, HH, WW = w.shape
@@ -474,12 +472,12 @@ def conv_backward_naive(dout, cache):
     x_pad = np.pad(x, ((0, 0), (0, 0), (pad, pad), (pad, pad)), 'constant', constant_values=0)
     H_prime = 1 + (H + 2 * pad - HH) // stride
     W_prime = 1 + (W + 2 * pad - WW) // stride
-    # Construct output
+    # 구해야 할 dx_pad, dx, dw, db 초기화
     dx_pad = np.zeros_like(x_pad)
     dx = np.zeros_like(x)
     dw = np.zeros_like(w)
     db = np.zeros_like(b)
-    # Naive Loops
+    
     for n in range(N):
         for f in range(F):
             db[f] += dout[n, f].sum()
@@ -516,22 +514,23 @@ def max_pool_forward_naive(x, pool_param):
     # TODO: Implement the max pooling forward pass                            #
     ###########################################################################
 
-    # Extract shapes and constants
+    # 변수 값 추출
     N, C, H, W = x.shape
     HH = pool_param.get('pool_height', 2)
     WW = pool_param.get('pool_width', 2)
     stride = pool_param.get('stride', 2)
-    assert (H - HH) % stride == 0, 'Sanity Check Status: Max Pool Failed in Height'
-    assert (W - WW) % stride == 0, 'Sanity Check Status: Max Pool Failed in Width'
+    
     H_prime = 1 + (H - HH) // stride
     W_prime = 1 + (W - WW) // stride
-    # Construct output
+    # 출력 값 out 초기화
     out = np.zeros((N, C, H_prime, W_prime))
     # Naive Loops
-    for n in range(N):
-        for j in range(H_prime):
-            for i in range(W_prime):
-                out[n, :, j, i] = np.amax(x[n, :, j*stride:j*stride+HH, i*stride:i*stride+WW], axis=(-1, -2))
+    for n in range(N):  # 각 이미지 마다
+        for c in range(C):  # 각 채널 마다
+            for j in range(out_H):  # 각 높이마다
+                for i in range(out_W):  # 각 너비마다
+                    out[n, c, j, i] = np.max(x[n,c, j*stride:j*stride+HH, i*stride:i*stride+WW])
+
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -556,7 +555,7 @@ def max_pool_backward_naive(dout, cache):
     # TODO: Implement the max pooling backward pass                           #
     ###########################################################################
 
-    # Extract constants and shapes
+    # 변수 값 추출
     x, pool_param = cache
     N, C, H, W = x.shape
     HH = pool_param.get('pool_height', 2)
@@ -564,16 +563,16 @@ def max_pool_backward_naive(dout, cache):
     stride = pool_param.get('stride', 2)
     H_prime = 1 + (H - HH) // stride
     W_prime = 1 + (W - WW) // stride
-    # Construct output
+    # 구해야할 dx 초기화
     dx = np.zeros_like(x)
-    # Naive Loops
-    for n in range(N):
-        for c in range(C):
-            for j in range(H_prime):
-                for i in range(W_prime):
-                    ind = np.argmax(x[n, c, j*stride:j*stride+HH, i*stride:i*stride+WW])
-                    ind1, ind2 = np.unravel_index(ind, (HH, WW))
-                    dx[n, c, j*stride:j*stride+HH, i*stride:i*stride+WW][ind1, ind2] = dout[n, c, j, i]
+    
+    for n in range(N):  # 각 이미지마다
+        for c in range(C): # 각 채널마다
+            for j in range(H_prime): # 각 높이마다
+                for i in range(W_prime): # 각 너비마다
+                    ind = np.argmax(x[n, c, j*stride:j*stride+HH, i*stride:i*stride+WW]) # max인 부분 index 구함
+                    ind1, ind2 = np.unravel_index(ind, (HH, WW)) # linear index를 matrix 형태로 바꿈
+                    dx[n, c, j*stride:j*stride+HH, i*stride:i*stride+WW][ind1, ind2] = dout[n, c, j, i] # max인 부분에만 backprop 진행
 
     ###########################################################################
     #                             END OF YOUR CODE                            #
